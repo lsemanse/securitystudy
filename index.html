@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>SecureStudy — 정보보안기사 30일</title>
+  <meta name="theme-color" content="#0a0f1e" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SecureStudy" />
+  <meta name="description" content="정보보안기사 자격증 30일 완성 학습 앱" />
+  <link id="manifest-link" rel="manifest" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230a0f1e'/%3E%3Ctext x='90' y='118' font-size='80' text-anchor='middle'%3E%F0%9F%94%90%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0f1e; --surface: rgba(255,255,255,0.03); --border: rgba(255,255,255,0.08);
+      --accent: #3b82f6; --text: #e8eaf0; --muted: #8892a4;
+      --green: #4ade80; --red: #f87171;
+      --safe-top: env(safe-area-inset-top,0px); --safe-bot: env(safe-area-inset-bottom,0px);
+    }
+    html,body { height:100%; background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+    body::before { content:''; position:fixed; inset:0; z-index:0;
+      background-image: linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px), linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px);
+      background-size:44px 44px; pointer-events:none; }
+    .orb1,.orb2 { position:fixed; border-radius:50%; pointer-events:none; z-index:0; }
+    .orb1 { top:-15%; right:-10%; width:500px; height:500px; background:radial-gradient(circle,rgba(59,130,246,0.14) 0%,transparent 65%); }
+    .orb2 { bottom:-15%; left:-10%; width:600px; height:600px; background:radial-gradient(circle,rgba(139,92,246,0.09) 0%,transparent 65%); }
+    #app { position:relative; z-index:1; max-width:480px; margin:0 auto; padding:calc(var(--safe-top) + 16px) 16px calc(var(--safe-bot) + 40px); min-height:100dvh; }
+
+    .badge { display:inline-flex; align-items:center; gap:6px; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.3); border-radius:20px; padding:5px 14px; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent); }
+    .badge-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes popIn { from{opacity:0;transform:scale(.92)} to{opacity:1;transform:scale(1)} }
+    .fade-up { animation:fadeUp .4s ease both; }
+    .pop-in { animation:popIn .3s ease both; }
+
+    .app-header { text-align:center; padding:20px 0 28px; }
+    .app-title { font-size:30px; font-weight:900; letter-spacing:-1px; background:linear-gradient(135deg,#fff 20%,var(--accent) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:12px 0 6px; }
+    .app-subtitle { color:var(--muted); font-size:13px; }
+
+    .progress-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px 20px; margin-bottom:20px; }
+    .progress-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+    .progress-label { font-size:13px; color:var(--muted); }
+    .progress-count { font-size:13px; color:var(--accent); font-weight:700; }
+    .progress-track { height:6px; background:rgba(255,255,255,0.07); border-radius:3px; overflow:hidden; }
+    .progress-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,#2563eb,#60a5fa); transition:width .6s cubic-bezier(.4,0,.2,1); }
+
+    /* Week tabs */
+    .week-tabs { display:flex; gap:6px; margin-bottom:16px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
+    .week-tabs::-webkit-scrollbar { display:none; }
+    .week-tab { flex-shrink:0; padding:7px 14px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); color:var(--muted); transition:all .2s; white-space:nowrap; font-family:inherit; }
+    .week-tab.active { background:rgba(59,130,246,0.2); border-color:rgba(59,130,246,0.4); color:var(--accent); }
+
+    .today-card { background:linear-gradient(135deg,rgba(37,99,235,0.22) 0%,rgba(59,130,246,0.1) 100%); border:1px solid rgba(59,130,246,0.4); border-radius:22px; padding:24px; cursor:pointer; position:relative; overflow:hidden; transition:transform .2s; -webkit-tap-highlight-color:transparent; }
+    .today-card:active { transform:scale(.98); }
+    .today-chip { position:absolute; top:16px; right:16px; font-size:10px; color:var(--accent); background:rgba(59,130,246,0.18); border:1px solid rgba(59,130,246,0.3); padding:3px 10px; border-radius:20px; letter-spacing:1px; }
+    .today-emoji { font-size:40px; margin-bottom:14px; display:block; }
+    .today-category { font-size:11px; color:#6b9fd4; margin-bottom:6px; letter-spacing:.5px; }
+    .today-title { font-size:19px; font-weight:800; margin-bottom:16px; line-height:1.3; }
+    .tag { display:inline-block; background:rgba(59,130,246,0.18); border:1px solid rgba(59,130,246,0.28); border-radius:20px; padding:3px 10px; font-size:11px; color:var(--accent); margin:0 4px 4px 0; }
+    .done-badge { display:flex; align-items:center; gap:5px; color:var(--green); font-size:13px; font-weight:700; margin-top:14px; }
+
+    .section-label { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); font-weight:600; margin:22px 0 10px; }
+    .day-list { display:flex; flex-direction:column; gap:8px; }
+    .day-item { display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:13px 15px; cursor:pointer; transition:background .18s; -webkit-tap-highlight-color:transparent; }
+    .day-item.today { background:rgba(37,99,235,0.08); border-color:rgba(59,130,246,0.28); }
+    .day-item:active { background:rgba(255,255,255,0.06); }
+    .day-icon { width:38px; height:38px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:20px; background:rgba(255,255,255,0.05); }
+    .day-icon.done { background:rgba(74,222,128,0.12); font-size:16px; }
+    .day-info { flex:1; min-width:0; }
+    .day-title { font-size:13px; font-weight:600; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .day-title.done-text { color:#4b5563; }
+    .day-cat { font-size:11px; color:#3b4a5c; }
+    .day-num { font-size:11px; flex-shrink:0; }
+    .day-num.today-num { color:var(--accent); }
+    .day-num.other { color:#3b4a5c; }
+
+    /* Study view */
+    .back-row { display:flex; align-items:center; gap:10px; margin-bottom:22px; padding-top:6px; flex-wrap:wrap; }
+    .back-btn { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:var(--text); border-radius:10px; padding:8px 13px; cursor:pointer; font-size:13px; font-family:inherit; display:flex; align-items:center; gap:4px; -webkit-tap-highlight-color:transparent; }
+    .back-btn:active { background:rgba(255,255,255,0.1); }
+    .complete-chip { font-size:11px; color:var(--green); background:rgba(74,222,128,0.1); padding:4px 12px; border-radius:20px; margin-left:auto; }
+
+    .study-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:22px; margin-bottom:14px; }
+    .study-cat { font-size:11px; color:#6b9fd4; margin-bottom:8px; letter-spacing:.5px; }
+    .study-title { font-size:20px; font-weight:800; margin-bottom:20px; line-height:1.3; }
+    .content-body { font-size:14px; line-height:1.85; color:#c8cdd8; }
+    .content-heading { font-weight:800; color:var(--text); margin-top:16px; margin-bottom:4px; font-size:13px; letter-spacing:.3px; }
+    .content-bullet { display:flex; gap:8px; margin-bottom:4px; padding-left:4px; }
+    .bullet-dot { color:var(--accent); flex-shrink:0; }
+    .keywords-row { margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06); }
+    .keywords-label { font-size:10px; color:var(--muted); margin-bottom:8px; letter-spacing:1px; text-transform:uppercase; }
+
+    .quiz-btn { width:100%; padding:16px; background:linear-gradient(135deg,#1d4ed8,#3b82f6); border:none; border-radius:14px; color:#fff; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; letter-spacing:.3px; -webkit-tap-highlight-color:transparent; transition:opacity .2s; }
+    .quiz-btn:active { opacity:.85; }
+    .quiz-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:22px; }
+    .quiz-section-label { font-size:10px; color:var(--muted); margin-bottom:12px; letter-spacing:1px; text-transform:uppercase; }
+    .quiz-question { font-size:15px; font-weight:700; margin-bottom:18px; line-height:1.5; color:var(--text); }
+    .quiz-options { display:flex; flex-direction:column; gap:9px; }
+    .quiz-option { display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:13px 15px; color:#c8cdd8; font-size:14px; text-align:left; cursor:pointer; transition:all .2s; font-family:inherit; -webkit-tap-highlight-color:transparent; }
+    .quiz-option.correct { background:rgba(74,222,128,0.12); border-color:rgba(74,222,128,0.4); color:var(--green); }
+    .quiz-option.wrong { background:rgba(239,68,68,0.12); border-color:rgba(239,68,68,0.4); color:var(--red); }
+    .opt-num { width:26px; height:26px; border-radius:50%; flex-shrink:0; background:rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; }
+    .quiz-result { margin-top:14px; padding:14px; border-radius:12px; font-size:14px; font-weight:700; }
+    .quiz-result.ok { background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.3); color:var(--green); }
+    .quiz-result.ng { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:var(--red); }
+    .manual-done-btn { margin-top:10px; width:100%; padding:13px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:#c8cdd8; font-size:13px; cursor:pointer; font-family:inherit; }
+
+    #install-banner { display:none; position:fixed; bottom:calc(var(--safe-bot) + 12px); left:16px; right:16px; background:rgba(15,23,42,0.95); backdrop-filter:blur(12px); border:1px solid rgba(59,130,246,0.35); border-radius:16px; padding:14px 16px; z-index:100; flex-direction:column; gap:10px; box-shadow:0 8px 32px rgba(0,0,0,0.4); }
+    #install-banner.show { display:flex; }
+    .install-text { font-size:13px; color:var(--text); font-weight:600; }
+    .install-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+    .install-actions { display:flex; gap:8px; }
+    .install-ok { flex:1; padding:10px; border:none; border-radius:10px; background:var(--accent); color:#fff; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+    .install-dismiss { padding:10px 14px; border:1px solid var(--border); border-radius:10px; background:transparent; color:var(--muted); font-size:13px; cursor:pointer; font-family:inherit; }
+  </style>
+</head>
+<body>
+<div class="orb1"></div>
+<div class="orb2"></div>
+<div id="app"></div>
+
+<div id="install-banner">
+  <div>
+    <div class="install-text">🔐 홈 화면에 추가하기</div>
+    <div class="install-sub">앱처럼 바로 실행할 수 있어요</div>
+  </div>
+  <div class="install-actions">
+    <button class="install-ok" id="install-ok-btn">설치하기</button>
+    <button class="install-dismiss" id="install-dismiss-btn">나중에</button>
+  </div>
+</div>
+
+<script>
+const STUDY_DATA = [
+  // ── WEEK 1: 암호학 ──────────────────────────────────────
+  {
+    day:1, category:"암호학 기초", emoji:"🔐", title:"대칭키 vs 비대칭키 암호화",
+    content:[
+      {type:"h",text:"대칭키 암호화 (Symmetric Key)"},
+      {type:"b",text:"암호화와 복호화에 동일한 키 사용"},
+      {type:"b",text:"속도가 빠르고 대용량 데이터에 적합"},
+      {type:"b",text:"대표 알고리즘: AES, DES, 3DES, ARIA"},
+      {type:"b",text:"문제점: 키 배송 문제 (Key Distribution Problem)"},
+      {type:"h",text:"비대칭키 암호화 (Asymmetric Key)"},
+      {type:"b",text:"공개키(Public Key)와 개인키(Private Key) 쌍 사용"},
+      {type:"b",text:"공개키로 암호화 → 개인키로 복호화"},
+      {type:"b",text:"대표 알고리즘: RSA, ECC, ElGamal"},
+      {type:"b",text:"속도 느리지만 키 배송 문제 해결"},
+    ],
+    keywords:["AES","RSA","대칭키","비대칭키","공개키","개인키"],
+    quiz:{q:"키 배송 문제를 해결하기 위해 사용하는 암호화 방식은?",opts:["대칭키 암호화","비대칭키 암호화","해시 함수","스트림 암호"],ans:1}
+  },
+  {
+    day:2, category:"암호학 기초", emoji:"🔢", title:"블록 암호 운용 모드 (ECB, CBC, CTR)",
+    content:[
+      {type:"h",text:"ECB (Electronic Codebook)"},
+      {type:"b",text:"각 블록을 독립적으로 암호화"},
+      {type:"b",text:"같은 평문 → 같은 암호문 (패턴 노출 취약)"},
+      {type:"b",text:"병렬 처리 가능하나 보안성 낮음"},
+      {type:"h",text:"CBC (Cipher Block Chaining)"},
+      {type:"b",text:"이전 암호문 블록과 XOR 후 암호화"},
+      {type:"b",text:"IV(초기화 벡터) 필요"},
+      {type:"b",text:"패턴 숨김 가능, 가장 널리 사용"},
+      {type:"h",text:"CTR (Counter Mode)"},
+      {type:"b",text:"카운터 값을 암호화 후 평문과 XOR"},
+      {type:"b",text:"병렬 처리 가능, 스트림 암호처럼 동작"},
+      {type:"b",text:"임의 접근(Random Access) 가능"},
+    ],
+    keywords:["ECB","CBC","CTR","IV","블록 암호","운용 모드"],
+    quiz:{q:"이전 암호문 블록과 XOR하여 암호화하는 블록 암호 운용 모드는?",opts:["ECB","CBC","CTR","OFB"],ans:1}
+  },
+  {
+    day:3, category:"암호학 심화", emoji:"🔑", title:"해시 함수와 전자서명",
+    content:[
+      {type:"h",text:"해시 함수 (Hash Function)"},
+      {type:"b",text:"임의 길이 입력 → 고정 길이 출력"},
+      {type:"b",text:"일방향성: 역산 불가"},
+      {type:"b",text:"충돌 저항성: 같은 해시값 두 입력 찾기 어려움"},
+      {type:"b",text:"주요 알고리즘: MD5(128bit), SHA-1(160bit), SHA-256, SHA-3"},
+      {type:"h",text:"전자서명 (Digital Signature)"},
+      {type:"b",text:"서명: 송신자 개인키로 메시지 해시값 암호화"},
+      {type:"b",text:"검증: 송신자 공개키로 복호화 후 해시값 비교"},
+      {type:"b",text:"무결성 + 인증 + 부인방지(Non-Repudiation) 제공"},
+      {type:"h",text:"MAC (Message Authentication Code)"},
+      {type:"b",text:"대칭키 기반 메시지 인증 / HMAC: 해시 + 비밀키"},
+      {type:"b",text:"부인방지 기능 없음"},
+    ],
+    keywords:["SHA-256","MD5","전자서명","HMAC","부인방지","무결성"],
+    quiz:{q:"전자서명에서 서명 생성 시 사용하는 키는?",opts:["수신자 공개키","수신자 개인키","송신자 공개키","송신자 개인키"],ans:3}
+  },
+  {
+    day:4, category:"암호학 심화", emoji:"🤝", title:"키 교환 프로토콜 (Diffie-Hellman, PKI)",
+    content:[
+      {type:"h",text:"Diffie-Hellman 키 교환"},
+      {type:"b",text:"공개 채널에서 안전하게 비밀 키 합의"},
+      {type:"b",text:"이산 로그 문제의 어려움에 기반"},
+      {type:"b",text:"중간자 공격(MITM)에 취약 → 인증 필요"},
+      {type:"h",text:"PKI (공개키 기반 구조)"},
+      {type:"b",text:"인증기관(CA)이 공개키의 유효성 보증"},
+      {type:"b",text:"디지털 인증서: 공개키 + 소유자 정보 + CA 서명"},
+      {type:"b",text:"인증서 폐기: CRL(인증서 폐기 목록), OCSP"},
+      {type:"h",text:"인증서 계층 구조"},
+      {type:"b",text:"루트 CA → 중간 CA → 서버 인증서"},
+      {type:"b",text:"신뢰 체인(Chain of Trust) 형성"},
+    ],
+    keywords:["Diffie-Hellman","PKI","CA","디지털 인증서","CRL","OCSP"],
+    quiz:{q:"공개 채널에서 비밀 키를 안전하게 합의하는 프로토콜은?",opts:["RSA","Diffie-Hellman","AES","SHA-256"],ans:1}
+  },
+  {
+    day:5, category:"암호학 응용", emoji:"🌐", title:"SSL/TLS 프로토콜",
+    content:[
+      {type:"h",text:"SSL/TLS 개요"},
+      {type:"b",text:"전송 계층 보안 프로토콜 (L4-L7)"},
+      {type:"b",text:"기밀성, 무결성, 인증 제공"},
+      {type:"b",text:"HTTPS = HTTP + TLS"},
+      {type:"h",text:"TLS 핸드셰이크 과정"},
+      {type:"b",text:"1. Client Hello: 지원 암호 스위트 전송"},
+      {type:"b",text:"2. Server Hello: 암호 스위트 선택 + 인증서 전송"},
+      {type:"b",text:"3. 키 교환 (Diffie-Hellman 또는 RSA)"},
+      {type:"b",text:"4. 세션 키 생성 후 암호화 통신 시작"},
+      {type:"h",text:"TLS 버전"},
+      {type:"b",text:"TLS 1.2: 현재 주로 사용"},
+      {type:"b",text:"TLS 1.3: 핸드셰이크 단순화, 속도 향상"},
+      {type:"b",text:"SSL 3.0 이하: POODLE 취약점으로 사용 금지"},
+    ],
+    keywords:["TLS","SSL","HTTPS","핸드셰이크","암호 스위트","세션 키"],
+    quiz:{q:"TLS 핸드셰이크에서 클라이언트가 가장 먼저 하는 것은?",opts:["인증서 검증","세션 키 생성","Client Hello 전송","데이터 암호화"],ans:2}
+  },
+  {
+    day:6, category:"암호학 응용", emoji:"🎲", title:"난수 생성과 암호학적 응용",
+    content:[
+      {type:"h",text:"난수 생성기 (RNG)"},
+      {type:"b",text:"TRNG (True RNG): 물리적 엔트로피 기반"},
+      {type:"b",text:"PRNG (의사 난수): 알고리즘 기반, 재현 가능"},
+      {type:"b",text:"CSPRNG: 암호학적으로 안전한 의사 난수 생성기"},
+      {type:"h",text:"암호학적 응용"},
+      {type:"b",text:"세션 키 생성, 소금값(Salt), IV 생성에 사용"},
+      {type:"b",text:"OTP(일회용 패드): 완전한 기밀성 제공"},
+      {type:"b",text:"약한 난수 → 예측 공격 가능"},
+      {type:"h",text:"솔팅(Salting)"},
+      {type:"b",text:"패스워드 해시에 랜덤값 추가"},
+      {type:"b",text:"Rainbow Table 공격 방어"},
+      {type:"b",text:"bcrypt, Argon2: 솔팅 + 반복 해싱"},
+    ],
+    keywords:["CSPRNG","OTP","솔팅","Rainbow Table","bcrypt","엔트로피"],
+    quiz:{q:"패스워드 해시 시 Rainbow Table 공격을 방어하기 위해 사용하는 기법은?",opts:["솔팅(Salting)","스트레칭","패딩","XOR"],ans:0}
+  },
+  {
+    day:7, category:"암호학 정리", emoji:"📐", title:"전자서명 알고리즘과 인증",
+    content:[
+      {type:"h",text:"DSA (Digital Signature Algorithm)"},
+      {type:"b",text:"미국 NIST 표준 전자서명 알고리즘"},
+      {type:"b",text:"이산 로그 문제 기반"},
+      {type:"b",text:"서명 전용 (암호화 불가)"},
+      {type:"h",text:"ECDSA"},
+      {type:"b",text:"타원곡선 기반 DSA"},
+      {type:"b",text:"더 짧은 키로 동등한 보안 강도"},
+      {type:"b",text:"비트코인, TLS에 사용"},
+      {type:"h",text:"인증 방식"},
+      {type:"b",text:"지식 기반: 패스워드, PIN"},
+      {type:"b",text:"소유 기반: OTP 토큰, 스마트카드"},
+      {type:"b",text:"생체 기반: 지문, 홍채"},
+      {type:"b",text:"다중 인증(MFA): 두 가지 이상 조합"},
+    ],
+    keywords:["DSA","ECDSA","MFA","OTP","생체인증","다중 인증"],
+    quiz:{q:"타원곡선 암호를 기반으로 한 전자서명 알고리즘은?",opts:["RSA","DSA","ECDSA","MD5"],ans:2}
+  },
+
+  // ── WEEK 2: 네트워크 보안 ───────────────────────────────
+  {
+    day:8, category:"네트워크 보안", emoji:"🌐", title:"방화벽(Firewall)과 IDS/IPS",
+    content:[
+      {type:"h",text:"방화벽 (Firewall)"},
+      {type:"b",text:"패킷 필터링: IP, Port 기반 트래픽 차단"},
+      {type:"b",text:"상태 기반 검사(Stateful Inspection): 연결 상태 추적"},
+      {type:"b",text:"애플리케이션 게이트웨이: 응용 계층 필터링"},
+      {type:"h",text:"IDS (Intrusion Detection System)"},
+      {type:"b",text:"침입 탐지 시스템 — 탐지만 수행"},
+      {type:"b",text:"오용탐지(Misuse): 시그니처 기반"},
+      {type:"b",text:"이상탐지(Anomaly): 정상 패턴 벗어남 탐지"},
+      {type:"h",text:"IPS (Intrusion Prevention System)"},
+      {type:"b",text:"침입 차단 시스템 — 탐지 + 차단"},
+      {type:"b",text:"인라인(Inline) 방식으로 트래픽 직접 차단"},
+    ],
+    keywords:["방화벽","IDS","IPS","패킷 필터링","오용탐지","이상탐지"],
+    quiz:{q:"탐지만 하고 차단은 하지 않는 보안 장비는?",opts:["방화벽","IPS","IDS","UTM"],ans:2}
+  },
+  {
+    day:9, category:"네트워크 보안", emoji:"⚠️", title:"DoS / DDoS 공격 유형",
+    content:[
+      {type:"h",text:"DoS (Denial of Service)"},
+      {type:"b",text:"SYN Flooding: 반쪽 연결 요청 대량 전송"},
+      {type:"b",text:"Ping of Death: 비정상 크기 패킷 전송"},
+      {type:"b",text:"Teardrop: 조각난 패킷 재조합 오류 유발"},
+      {type:"b",text:"Land Attack: 출발지=목적지 IP 설정"},
+      {type:"h",text:"DDoS (Distributed DoS)"},
+      {type:"b",text:"다수의 좀비 PC(봇넷)를 이용한 분산 공격"},
+      {type:"b",text:"HTTP Flooding, DNS Amplification 등"},
+      {type:"h",text:"DRDoS (반사 공격)"},
+      {type:"b",text:"정상 서버를 반사체로 이용"},
+      {type:"b",text:"IP Spoofing으로 출발지 위조"},
+      {type:"b",text:"증폭 효과로 소량 트래픽 → 대량 공격"},
+    ],
+    keywords:["DoS","DDoS","SYN Flooding","봇넷","IP Spoofing","DRDoS"],
+    quiz:{q:"TCP 연결 요청(SYN)을 대량 전송해 서버 자원을 고갈시키는 공격은?",opts:["Ping of Death","Land Attack","SYN Flooding","Teardrop"],ans:2}
+  },
+  {
+    day:10, category:"네트워크 보안", emoji:"🕵️", title:"스니핑과 스푸핑 공격",
+    content:[
+      {type:"h",text:"스니핑 (Sniffing)"},
+      {type:"b",text:"네트워크 트래픽을 도청하는 공격"},
+      {type:"b",text:"패시브 스니핑: 허브 환경에서 모든 패킷 수신"},
+      {type:"b",text:"액티브 스니핑: 스위치 환경에서 ARP 스푸핑 활용"},
+      {type:"b",text:"대응: 암호화(TLS), 스위치 사용"},
+      {type:"h",text:"스푸핑 (Spoofing)"},
+      {type:"b",text:"IP 스푸핑: 출발지 IP 위조"},
+      {type:"b",text:"ARP 스푸핑: MAC 주소 위조 → 트래픽 가로채기"},
+      {type:"b",text:"DNS 스푸핑: 도메인 → 위조 IP 응답"},
+      {type:"h",text:"대응 방법"},
+      {type:"b",text:"ARP: 정적 ARP 테이블, Dynamic ARP Inspection"},
+      {type:"b",text:"DNS: DNSSEC 사용"},
+    ],
+    keywords:["스니핑","ARP 스푸핑","IP 스푸핑","DNS 스푸핑","DNSSEC","패킷 도청"],
+    quiz:{q:"MAC 주소를 위조하여 스위치 환경에서 트래픽을 가로채는 공격은?",opts:["IP 스푸핑","ARP 스푸핑","DNS 스푸핑","세션 하이재킹"],ans:1}
+  },
+  {
+    day:11, category:"네트워크 보안", emoji:"🛡️", title:"VPN과 터널링 프로토콜",
+    content:[
+      {type:"h",text:"VPN (Virtual Private Network)"},
+      {type:"b",text:"공중망을 통해 사설망처럼 안전한 통신"},
+      {type:"b",text:"터널링 + 암호화 + 인증 제공"},
+      {type:"h",text:"IPSec"},
+      {type:"b",text:"네트워크 계층(L3) VPN 프로토콜"},
+      {type:"b",text:"AH(인증 헤더): 무결성 + 인증 (암호화 없음)"},
+      {type:"b",text:"ESP(캡슐화 보안 페이로드): 암호화 + 인증"},
+      {type:"b",text:"전송 모드 vs 터널 모드"},
+      {type:"h",text:"SSL VPN"},
+      {type:"b",text:"응용 계층 VPN, 브라우저로 접속 가능"},
+      {type:"b",text:"포트 443 사용, 방화벽 통과 용이"},
+      {type:"b",text:"IPSec VPN보다 설치 간편"},
+    ],
+    keywords:["VPN","IPSec","AH","ESP","SSL VPN","터널링"],
+    quiz:{q:"IPSec에서 암호화와 인증을 모두 제공하는 프로토콜은?",opts:["AH","ESP","IKE","ISAKMP"],ans:1}
+  },
+  {
+    day:12, category:"네트워크 보안", emoji:"📡", title:"무선 네트워크 보안 (WEP, WPA)",
+    content:[
+      {type:"h",text:"WEP (Wired Equivalent Privacy)"},
+      {type:"b",text:"초기 무선 보안 표준, RC4 스트림 암호 사용"},
+      {type:"b",text:"IV(24bit)가 짧아 재사용 → 키 복원 취약"},
+      {type:"b",text:"현재 사용 금지 (보안 취약)"},
+      {type:"h",text:"WPA / WPA2"},
+      {type:"b",text:"WPA: TKIP, 임시 키 사용"},
+      {type:"b",text:"WPA2: AES-CCMP 사용, 현재 표준"},
+      {type:"b",text:"WPA2-Personal: PSK(사전 공유 키)"},
+      {type:"b",text:"WPA2-Enterprise: 802.1X + RADIUS 서버"},
+      {type:"h",text:"WPA3"},
+      {type:"b",text:"SAE(Simultaneous Authentication of Equals)"},
+      {type:"b",text:"사전 공격에 강한 개선된 핸드셰이크"},
+    ],
+    keywords:["WEP","WPA2","WPA3","AES-CCMP","802.1X","RADIUS"],
+    quiz:{q:"AES-CCMP를 사용하는 현재 무선 보안 표준은?",opts:["WEP","WPA","WPA2","WPA3"],ans:2}
+  },
+  {
+    day:13, category:"네트워크 보안", emoji:"🔌", title:"네트워크 프로토콜 취약점",
+    content:[
+      {type:"h",text:"TCP/IP 취약점"},
+      {type:"b",text:"IP: 출발지 주소 위조(Spoofing) 가능"},
+      {type:"b",text:"TCP: SYN Flood, 세션 하이재킹"},
+      {type:"b",text:"UDP: 포트 스캔, 증폭 공격에 악용"},
+      {type:"h",text:"DNS 취약점"},
+      {type:"b",text:"DNS 캐시 포이즈닝: 잘못된 레코드 주입"},
+      {type:"b",text:"DNS 증폭 공격: 소량 요청 → 대량 응답"},
+      {type:"b",text:"대응: DNSSEC, RPZ"},
+      {type:"h",text:"ICMP 취약점"},
+      {type:"b",text:"Ping of Death, Smurf Attack"},
+      {type:"b",text:"Smurf: 브로드캐스트로 Ping → 피해자에게 집중"},
+      {type:"b",text:"대응: ICMP 필터링, 방향 브로드캐스트 차단"},
+    ],
+    keywords:["DNS 캐시 포이즈닝","Smurf Attack","세션 하이재킹","DNSSEC","TCP","ICMP"],
+    quiz:{q:"잘못된 DNS 레코드를 캐시에 주입하는 공격은?",opts:["DNS 증폭","DNS 캐시 포이즈닝","DNS 터널링","DNSSEC"],ans:1}
+  },
+  {
+    day:14, category:"네트워크 보안", emoji:"🔍", title:"포트 스캔과 취약점 스캐닝",
+    content:[
+      {type:"h",text:"포트 스캔 유형"},
+      {type:"b",text:"TCP Connect 스캔: 완전한 3-way 핸드셰이크"},
+      {type:"b",text:"SYN(Half-Open) 스캔: SYN만 보내고 응답 확인"},
+      {type:"b",text:"UDP 스캔: ICMP 응답으로 포트 상태 판별"},
+      {type:"b",text:"FIN/NULL/XMAS 스캔: 방화벽 우회 목적"},
+      {type:"h",text:"취약점 스캐닝"},
+      {type:"b",text:"네트워크 취약점 자동 탐지 도구"},
+      {type:"b",text:"Nessus, OpenVAS, Nmap 등"},
+      {type:"b",text:"CVE(Common Vulnerabilities and Exposures)"},
+      {type:"h",text:"대응"},
+      {type:"b",text:"불필요한 포트 차단"},
+      {type:"b",text:"포트 스캔 탐지 및 IP 차단"},
+    ],
+    keywords:["SYN 스캔","Nmap","Nessus","CVE","포트 스캔","취약점 스캐닝"],
+    quiz:{q:"SYN 패킷만 보내고 3-way 핸드셰이크를 완료하지 않는 스캔 방식은?",opts:["TCP Connect","SYN 스캔","FIN 스캔","XMAS 스캔"],ans:1}
+  },
+
+  // ── WEEK 3: 접근 통제 & 시스템 보안 ────────────────────
+  {
+    day:15, category:"접근 통제", emoji:"🛡️", title:"접근통제 모델 (DAC, MAC, RBAC)",
+    content:[
+      {type:"h",text:"DAC (임의적 접근통제)"},
+      {type:"b",text:"Discretionary Access Control"},
+      {type:"b",text:"자원 소유자가 접근 권한 직접 결정"},
+      {type:"b",text:"유연하지만 트로이목마 취약 / 예: Unix 파일 권한"},
+      {type:"h",text:"MAC (강제적 접근통제)"},
+      {type:"b",text:"Mandatory Access Control"},
+      {type:"b",text:"시스템이 보안 레이블 기반으로 결정"},
+      {type:"b",text:"군사·정부 시스템 / 예: SELinux"},
+      {type:"h",text:"RBAC (역할기반 접근통제)"},
+      {type:"b",text:"Role-Based Access Control"},
+      {type:"b",text:"역할에 권한 부여 → 사용자에게 역할 할당"},
+      {type:"b",text:"기업 환경에 적합, 최소 권한 원칙 적용"},
+    ],
+    keywords:["DAC","MAC","RBAC","접근통제","보안 레이블","최소 권한"],
+    quiz:{q:"사용자의 역할(Role)을 기반으로 접근 권한을 부여하는 모델은?",opts:["DAC","MAC","RBAC","Bell-LaPadula"],ans:2}
+  },
+  {
+    day:16, category:"접근 통제", emoji:"🏛️", title:"보안 모델 (Bell-LaPadula, Biba)",
+    content:[
+      {type:"h",text:"Bell-LaPadula 모델"},
+      {type:"b",text:"기밀성(Confidentiality) 중심 모델"},
+      {type:"b",text:"No Read Up: 높은 등급 문서 읽기 금지"},
+      {type:"b",text:"No Write Down: 낮은 등급으로 쓰기 금지"},
+      {type:"b",text:"군사 보안 분류에 적합"},
+      {type:"h",text:"Biba 모델"},
+      {type:"b",text:"무결성(Integrity) 중심 모델"},
+      {type:"b",text:"No Read Down: 낮은 등급 문서 읽기 금지"},
+      {type:"b",text:"No Write Up: 높은 등급으로 쓰기 금지"},
+      {type:"h",text:"Clark-Wilson 모델"},
+      {type:"b",text:"상업 환경의 무결성 보호"},
+      {type:"b",text:"직무 분리, 감사 추적"},
+    ],
+    keywords:["Bell-LaPadula","Biba","무결성","기밀성","No Read Up","Clark-Wilson"],
+    quiz:{q:"기밀성 보호를 위해 'No Read Up' 규칙을 적용하는 보안 모델은?",opts:["Biba","Clark-Wilson","Bell-LaPadula","Take-Grant"],ans:2}
+  },
+  {
+    day:17, category:"시스템 보안", emoji:"💻", title:"운영체제 보안과 권한 관리",
+    content:[
+      {type:"h",text:"운영체제 보안 개요"},
+      {type:"b",text:"TCB(신뢰 컴퓨팅 기반): 보안 정책 집행 핵심"},
+      {type:"b",text:"보안 커널: 참조 모니터 구현"},
+      {type:"b",text:"최소 권한 원칙, 직무 분리"},
+      {type:"h",text:"Unix/Linux 권한 체계"},
+      {type:"b",text:"소유자/그룹/기타 3계층 권한"},
+      {type:"b",text:"chmod, chown, umask"},
+      {type:"b",text:"SUID/SGID: 실행 시 소유자 권한으로 동작"},
+      {type:"h",text:"Windows 권한 체계"},
+      {type:"b",text:"ACL(Access Control List) 기반"},
+      {type:"b",text:"UAC(사용자 계정 컨트롤)"),
+      {type:"b",text:"레지스트리 보안, 그룹 정책"},
+    ],
+    keywords:["TCB","SUID","ACL","UAC","최소 권한","참조 모니터"],
+    quiz:{q:"Unix에서 실행 시 파일 소유자의 권한으로 동작하게 하는 특수 권한은?",opts:["chmod","umask","SUID","ACL"],ans:2}
+  },
+  {
+    day:18, category:"시스템 보안", emoji:"🦠", title:"악성코드 유형과 분석",
+    content:[
+      {type:"h",text:"악성코드 유형"},
+      {type:"b",text:"바이러스: 정상 파일에 삽입, 자기 복제"},
+      {type:"b",text:"웜: 네트워크를 통해 자율 전파"},
+      {type:"b",text:"트로이목마: 정상 프로그램 위장, 백도어 설치"},
+      {type:"b",text:"랜섬웨어: 파일 암호화 후 금전 요구"},
+      {type:"b",text:"루트킷: 관리자 권한 탈취, 흔적 은폐"},
+      {type:"h",text:"악성코드 분석"},
+      {type:"b",text:"정적 분석: 실행 없이 코드 구조 분석"},
+      {type:"b",text:"동적 분석: 샌드박스에서 실행 후 행위 관찰"},
+      {type:"h",text:"대응"},
+      {type:"b",text:"안티바이러스: 시그니처 + 행위 기반 탐지"},
+      {type:"b",text:"EDR(엔드포인트 탐지 및 대응)"},
+    ],
+    keywords:["바이러스","웜","트로이목마","랜섬웨어","루트킷","EDR"],
+    quiz:{q:"네트워크를 통해 사용자 개입 없이 자율적으로 전파되는 악성코드는?",opts:["바이러스","웜","트로이목마","루트킷"],ans:1}
+  },
+  {
+    day:19, category:"시스템 보안", emoji:"💉", title:"버퍼 오버플로우와 시스템 취약점",
+    content:[
+      {type:"h",text:"버퍼 오버플로우"},
+      {type:"b",text:"입력 데이터가 버퍼 크기 초과 → 인접 메모리 덮어쓰기"},
+      {type:"b",text:"스택 기반: 반환 주소 변조 → 셸코드 실행"},
+      {type:"b",text:"힙 기반: 동적 할당 메모리 공격"},
+      {type:"h",text:"대응 기법"},
+      {type:"b",text:"스택 카나리(Stack Canary): 반환 주소 전 감시값"},
+      {type:"b",text:"ASLR: 메모리 주소 무작위화"},
+      {type:"b",text:"DEP/NX: 데이터 영역 실행 방지"},
+      {type:"b",text:"안전한 함수 사용: strcpy → strncpy"},
+      {type:"h",text:"기타 취약점"},
+      {type:"b",text:"포맷 스트링: printf 취약점 악용"},
+      {type:"b",text:"Use-After-Free: 해제된 메모리 재사용"},
+    ],
+    keywords:["버퍼 오버플로우","ASLR","DEP","스택 카나리","셸코드","Use-After-Free"],
+    quiz:{q:"메모리 주소를 무작위화하여 버퍼 오버플로우 공격을 어렵게 하는 기법은?",opts:["DEP","ASLR","스택 카나리","NX비트"],ans:1}
+  },
+  {
+    day:20, category:"시스템 보안", emoji:"🔎", title:"디지털 포렌식 기초",
+    content:[
+      {type:"h",text:"디지털 포렌식 개요"},
+      {type:"b",text:"디지털 증거 수집·보존·분석·제출 절차"},
+      {type:"b",text:"증거의 법적 효력 확보가 핵심"},
+      {type:"h",text:"포렌식 기본 원칙"},
+      {type:"b",text:"무결성: 원본 증거 변경 없음 (해시로 검증)"},
+      {type:"b",text:"연계 보관성(Chain of Custody): 증거 이동 기록"},
+      {type:"b",text:"재현성: 동일 환경에서 동일 결과"},
+      {type:"h",text:"포렌식 절차"},
+      {type:"b",text:"1. 증거 식별 → 2. 수집(이미징) → 3. 보존"},
+      {type:"b",text:"4. 분석 → 5. 문서화 → 6. 제출"},
+      {type:"b",text:"라이브 포렌식: 휘발성 데이터 우선 수집"},
+    ],
+    keywords:["디지털 포렌식","Chain of Custody","무결성","라이브 포렌식","이미징","해시"],
+    quiz:{q:"디지털 포렌식에서 증거의 이동 및 보관 과정을 기록하는 것은?",opts:["무결성 검증","Chain of Custody","라이브 포렌식","이미지 복사"],ans:1}
+  },
+  {
+    day:21, category:"시스템 보안", emoji:"🧪", title:"침투 테스트와 취약점 관리",
+    content:[
+      {type:"h",text:"침투 테스트 (Penetration Testing)"},
+      {type:"b",text:"허가된 환경에서 실제 공격자처럼 보안 평가"},
+      {type:"b",text:"블랙박스: 내부 정보 없이 테스트"},
+      {type:"b",text:"화이트박스: 전체 정보 공유 후 테스트"},
+      {type:"b",text:"그레이박스: 일부 정보 공유"},
+      {type:"h",text:"침투 테스트 단계"},
+      {type:"b",text:"정찰 → 스캐닝 → 취약점 분석 → 익스플로잇 → 보고"},
+      {type:"h",text:"취약점 관리"},
+      {type:"b",text:"CVE: 공개 취약점 번호 체계"},
+      {type:"b",text:"CVSS: 취약점 심각도 점수 (0~10)"},
+      {type:"b",text:"패치 관리: 정기적 업데이트 적용"},
+    ],
+    keywords:["침투 테스트","블랙박스","CVE","CVSS","패치 관리","익스플로잇"],
+    quiz:{q:"공개 취약점에 고유 번호를 부여하는 체계는?",opts:["CVSS","CVE","CWE","NVD"],ans:1}
+  },
+
+  // ── WEEK 4: 웹 보안 & 정보보호 관리 ─────────────────────
+  {
+    day:22, category:"웹 보안", emoji:"💻", title:"OWASP Top 10 — SQL Injection, XSS",
+    content:[
+      {type:"h",text:"SQL Injection"},
+      {type:"b",text:"DB 쿼리에 악의적 SQL 삽입"},
+      {type:"b",text:"인증 우회, 데이터 유출, DB 삭제 가능"},
+      {type:"b",text:"대응: Prepared Statement, 파라미터화 쿼리"},
+      {type:"b",text:"대응: 입력값 검증, DB 계정 최소 권한"},
+      {type:"h",text:"XSS (Cross-Site Scripting)"},
+      {type:"b",text:"악성 스크립트를 웹페이지에 삽입"},
+      {type:"b",text:"Stored XSS: DB에 저장 → 다른 사용자 실행"},
+      {type:"b",text:"Reflected XSS: URL 파라미터에 삽입"},
+      {type:"b",text:"DOM-based XSS: 클라이언트 측 DOM 조작"},
+      {type:"b",text:"대응: 입력값 이스케이프, CSP 헤더"},
+    ],
+    keywords:["SQL Injection","XSS","Stored XSS","Reflected XSS","CSP","Prepared Statement"],
+    quiz:{q:"SQL Injection 방어를 위해 가장 효과적인 방법은?",opts:["입력 길이 제한","Prepared Statement","WAF 설치","HTTPS 적용"],ans:1}
+  },
+  {
+    day:23, category:"웹 보안", emoji:"🎭", title:"CSRF, 클릭재킹, 세션 관리",
+    content:[
+      {type:"h",text:"CSRF (Cross-Site Request Forgery)"},
+      {type:"b",text:"인증된 사용자 권한으로 요청 위조"},
+      {type:"b",text:"피해자가 악성 링크 클릭 → 의도치 않은 요청"},
+      {type:"b",text:"대응: CSRF 토큰, SameSite 쿠키, Referer 검증"},
+      {type:"h",text:"클릭재킹 (Clickjacking)"},
+      {type:"b",text:"투명한 iframe으로 사용자 클릭 도용"},
+      {type:"b",text:"대응: X-Frame-Options, CSP frame-ancestors"},
+      {type:"h",text:"세션 관리"},
+      {type:"b",text:"세션 하이재킹: 세션 ID 탈취"},
+      {type:"b",text:"세션 고정 공격: 공격자가 세션 ID 지정"},
+      {type:"b",text:"대응: HTTPS, HttpOnly 쿠키, 세션 만료"},
+    ],
+    keywords:["CSRF","CSRF 토큰","클릭재킹","세션 하이재킹","SameSite","X-Frame-Options"],
+    quiz:{q:"CSRF 공격 방어에 사용하는 대표적인 기법은?",opts:["입력값 이스케이프","CSRF 토큰","SQL 파라미터화","CSP"],ans:1}
+  },
+  {
+    day:24, category:"웹 보안", emoji:"🔓", title:"인증 취약점과 API 보안",
+    content:[
+      {type:"h",text:"인증 취약점"},
+      {type:"b",text:"Brute Force: 패스워드 무차별 대입"},
+      {type:"b",text:"Credential Stuffing: 유출된 계정으로 로그인 시도"},
+      {type:"b",text:"대응: 계정 잠금, MFA, CAPTCHA"},
+      {type:"h",text:"JWT (JSON Web Token)"},
+      {type:"b",text:"Header.Payload.Signature 구조"},
+      {type:"b",text:"취약점: alg:none 공격, 약한 서명 키"},
+      {type:"b",text:"대응: 강한 서명 알고리즘, 만료 시간 설정"},
+      {type:"h",text:"API 보안"},
+      {type:"b",text:"REST API: HTTPS, 인증 토큰 필수"},
+      {type:"b",text:"OAuth 2.0: 권한 위임 프로토콜"},
+      {type:"b",text:"API Rate Limiting: 과도한 요청 차단"},
+    ],
+    keywords:["Brute Force","JWT","OAuth 2.0","MFA","Credential Stuffing","Rate Limiting"],
+    quiz:{q:"유출된 계정 정보를 다른 사이트에 대입하는 공격은?",opts:["Brute Force","Credential Stuffing","Rainbow Table","SQL Injection"],ans:1}
+  },
+  {
+    day:25, category:"정보보호 관리", emoji:"📋", title:"정보보호 관리체계 (ISMS-P)",
+    content:[
+      {type:"h",text:"ISMS (정보보호 관리체계)"},
+      {type:"b",text:"체계적 정보보호를 위한 관리 프레임워크"},
+      {type:"b",text:"한국: ISMS-P / 국제: ISO 27001"},
+      {type:"b",text:"PDCA 사이클: Plan → Do → Check → Act"},
+      {type:"h",text:"ISMS-P 인증 의무 대상"},
+      {type:"b",text:"인터넷 서비스 일 평균 이용자 100만명 이상"},
+      {type:"b",text:"정보통신서비스 매출 100억 이상"},
+      {type:"b",text:"병원, 학교 등 대규모 개인정보 처리"},
+      {type:"h",text:"위험 관리"},
+      {type:"b",text:"위험 식별 → 분석 → 평가 → 처리"},
+      {type:"b",text:"위험 처리: 감소, 수용, 전가, 회피"},
+    ],
+    keywords:["ISMS","ISMS-P","ISO 27001","PDCA","위험 관리","위험 처리"],
+    quiz:{q:"ISMS의 관리 사이클 순서로 올바른 것은?",opts:["Do-Plan-Check-Act","Plan-Do-Check-Act","Check-Plan-Do-Act","Act-Check-Do-Plan"],ans:1}
+  },
+  {
+    day:26, category:"정보보호 관리", emoji:"⚖️", title:"개인정보보호법과 관련 법령",
+    content:[
+      {type:"h",text:"개인정보보호법 핵심"},
+      {type:"b",text:"개인정보: 살아있는 개인을 식별할 수 있는 정보"},
+      {type:"b",text:"수집·이용: 정보주체 동의 필요"},
+      {type:"b",text:"목적 외 이용·제공 금지"},
+      {type:"b",text:"개인정보 처리방침 공개 의무"},
+      {type:"h",text:"정보통신망법 주요 내용"},
+      {type:"b",text:"해킹, 악성코드 유포 처벌"},
+      {type:"b",text:"개인정보 유출 신고 의무 (72시간 내)"},
+      {type:"h",text:"주요 정보통신기반 보호법"},
+      {type:"b",text:"주요 정보통신기반시설 지정·보호"},
+      {type:"b",text:"취약점 분석·평가 의무화"},
+      {type:"b",text:"침해사고 대응 체계"},
+    ],
+    keywords:["개인정보보호법","정보통신망법","개인정보","72시간","기반시설","처리방침"],
+    quiz:{q:"개인정보 유출 발생 시 신고해야 하는 법적 기한은?",opts:["24시간","48시간","72시간","1주일"],ans:2}
+  },
+  {
+    day:27, category:"정보보호 관리", emoji:"🚨", title:"침해사고 대응 (CERT, 포렌식)",
+    content:[
+      {type:"h",text:"침해사고 대응 절차"},
+      {type:"b",text:"1. 준비 → 2. 탐지 → 3. 분석"},
+      {type:"b",text:"4. 억제 → 5. 복구 → 6. 사후 조치"},
+      {type:"h",text:"CERT/CSIRT"},
+      {type:"b",text:"침해사고 대응팀"},
+      {type:"b",text:"한국: KISA 인터넷침해대응센터 (118)"},
+      {type:"b",text:"사고 접수, 분석, 대응 지원"},
+      {type:"h",text:"로그 분석"},
+      {type:"b",text:"시스템 로그, 방화벽 로그, 웹 로그 분석"},
+      {type:"b",text:"SIEM: 보안 이벤트 통합 관리"},
+      {type:"b",text:"로그 보관: 최소 1년 이상 권고"},
+    ],
+    keywords:["CERT","CSIRT","SIEM","침해사고","KISA","로그 분석"],
+    quiz:{q:"보안 이벤트와 로그를 통합 수집·분석하는 시스템은?",opts:["IDS","IPS","SIEM","EDR"],ans:2}
+  },
+  {
+    day:28, category:"정보보호 관리", emoji:"🏗️", title:"보안 아키텍처와 클라우드 보안",
+    content:[
+      {type:"h",text:"보안 아키텍처"},
+      {type:"b",text:"심층 방어(Defense in Depth): 다계층 보안"},
+      {type:"b",text:"DMZ: 내부망과 외부망 사이 완충 구간"},
+      {type:"b",text:"제로 트러스트: 내부도 신뢰하지 않음"},
+      {type:"h",text:"클라우드 보안"},
+      {type:"b",text:"공동 책임 모델: CSP + 고객 책임 분리"},
+      {type:"b",text:"IaaS: 인프라만 제공, 고객 책임 큼"},
+      {type:"b",text:"SaaS: 대부분 CSP 책임"},
+      {type:"h",text:"클라우드 주요 위협"},
+      {type:"b",text:"데이터 유출, 계정 탈취"},
+      {type:"b",text:"잘못된 설정(Misconfiguration)"},
+      {type:"b",text:"CASB: 클라우드 접근 보안 브로커"},
+    ],
+    keywords:["심층 방어","DMZ","제로 트러스트","공동 책임","CASB","클라우드"],
+    quiz:{q:"내부 네트워크도 신뢰하지 않고 모든 접근을 검증하는 보안 모델은?",opts:["심층 방어","DMZ","제로 트러스트","VPN"],ans:2}
+  },
+  {
+    day:29, category:"보안 취약점 분석", emoji:"📊", title:"보안 평가와 컴플라이언스",
+    content:[
+      {type:"h",text:"보안 평가 기준"},
+      {type:"b",text:"CC(Common Criteria): 국제 보안 평가 기준"},
+      {type:"b",text:"EAL 1~7: 보안 보증 수준"},
+      {type:"b",text:"PP(보호 프로파일), ST(보안 목표 명세서)"},
+      {type:"h",text:"컴플라이언스"},
+      {type:"b",text:"PCI-DSS: 카드 결제 보안 표준"},
+      {type:"b",text:"HIPAA: 미국 의료정보 보호법"},
+      {type:"b",text:"GDPR: 유럽 개인정보 보호 규정"},
+      {type:"h",text:"보안 감사"},
+      {type:"b",text:"내부 감사 vs 외부 감사"},
+      {type:"b",text:"감사 로그: 누가·언제·무엇을 했는지 기록"},
+      {type:"b",text:"부인방지: 감사 추적으로 행위 입증"},
+    ],
+    keywords:["CC","EAL","PCI-DSS","GDPR","컴플라이언스","보안 감사"],
+    quiz:{q:"국제 보안 평가 기준으로 EAL 등급을 사용하는 것은?",opts:["ISMS","ISO 27001","CC(Common Criteria)","PCI-DSS"],ans:2}
+  },
+  {
+    day:30, category:"최종 정리", emoji:"🏆", title:"정보보안기사 핵심 총정리",
+    content:[
+      {type:"h",text:"암호학 핵심"},
+      {type:"b",text:"대칭키(AES), 비대칭키(RSA), 해시(SHA-256)"},
+      {type:"b",text:"전자서명: 송신자 개인키 서명 → 공개키 검증"},
+      {type:"b",text:"PKI: CA가 공개키 유효성 보증"},
+      {type:"h",text:"네트워크 보안 핵심"},
+      {type:"b",text:"방화벽·IDS·IPS 역할 구분"},
+      {type:"b",text:"IPSec AH(인증)/ESP(암호화+인증)"},
+      {type:"b",text:"TLS 핸드셰이크: Client Hello → 키 교환 → 암호화"},
+      {type:"h",text:"관리·법규 핵심"},
+      {type:"b",text:"ISMS-P PDCA, 위험 처리(감소·수용·전가·회피)"},
+      {type:"b",text:"개인정보 유출 72시간 내 신고"},
+      {type:"b",text:"CC EAL 등급, PCI-DSS, GDPR"},
+      {type:"h",text:"마지막 한 마디"},
+      {type:"b",text:"30일 완주 축하드립니다! 합격까지 화이팅! 🎉"},
+    ],
+    keywords:["AES","RSA","SHA-256","ISMS-P","IPSec","TLS","72시간","EAL"],
+    quiz:{q:"정보보안기사 시험, 합격할 준비가 됐나요?",opts:["아직 더 공부해야 해요","자신 있어요!","조금 더 반복할게요","모든 게 완벽해요!"],ans:1}
+  },
+];
+
+// ─── STATE ──────────────────────────────────────────────
+let completedDays = [];
+try { completedDays = JSON.parse(localStorage.getItem('ss30_completed') || '[]'); } catch {}
+
+let currentView = 'home';
+let selectedDay = null;
+let quizAnswered = null;
+let selectedOption = null;
+let showQuiz = false;
+let activeWeek = 0; // 0=전체, 1~5=주차
+
+const todayIdx = (() => {
+  const start = new Date('2025-01-01');
+  const now = new Date();
+  const diff = Math.floor((now - start) / 86400000);
+  return diff % STUDY_DATA.length;
+})();
+
+function saveCompleted() {
+  try { localStorage.setItem('ss30_completed', JSON.stringify(completedDays)); } catch {}
+}
+function markComplete(idx) {
+  if (!completedDays.includes(idx)) { completedDays.push(idx); saveCompleted(); }
+}
+
+// ─── RENDER ─────────────────────────────────────────────
+function render() {
+  document.getElementById('app').innerHTML = currentView === 'home' ? renderHome() : renderStudy();
+  bindEvents();
+}
+
+function getWeekDays() {
+  if (activeWeek === 0) return STUDY_DATA;
+  const start = (activeWeek - 1) * 7;
+  return STUDY_DATA.slice(start, start + 7);
+}
+
+function renderHome() {
+  const done = completedDays.length;
+  const total = STUDY_DATA.length;
+  const pct = Math.round((done / total) * 100);
+  const today = STUDY_DATA[todayIdx];
+  const weekDays = getWeekDays();
+
+  const weekTabs = ['전체', '1주차 암호학', '2주차 네트워크', '3주차 시스템', '4주차 웹·관리'].map((label, i) =>
+    `<button class="week-tab ${activeWeek === i ? 'active' : ''}" data-week="${i}">${label}</button>`
+  ).join('');
+
+  const dayItems = weekDays.map(item => {
+    const idx = item.day - 1;
+    const isDone = completedDays.includes(idx);
+    const isToday = idx === todayIdx;
+    return `
+      <div class="day-item ${isToday ? 'today' : ''}" data-open="${idx}">
+        <div class="day-icon ${isDone ? 'done' : ''}">${isDone ? '✓' : item.emoji}</div>
+        <div class="day-info">
+          <div class="day-title ${isDone ? 'done-text' : ''}">${item.title}</div>
+          <div class="day-cat">${item.category}</div>
+        </div>
+        <div class="day-num ${isToday ? 'today-num' : 'other'}">${isToday ? '오늘' : 'Day ' + item.day}</div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="app-header fade-up">
+      <div class="badge"><span class="badge-dot"></span>정보보안기사 30일 완성</div>
+      <div class="app-title">SecureStudy</div>
+      <div class="app-subtitle">매일 한 챕터씩 · 30일 후엔 합격</div>
+    </div>
+
+    <div class="progress-card fade-up" style="animation-delay:.05s">
+      <div class="progress-row">
+        <span class="progress-label">전체 진행률</span>
+        <span class="progress-count">${done} / ${total} 완료 (${pct}%)</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:${pct}%"></div>
+      </div>
+    </div>
+
+    <div class="section-label fade-up" style="animation-delay:.07s;margin-top:0">오늘의 학습</div>
+    <div class="today-card fade-up" data-open="${todayIdx}" style="animation-delay:.09s">
+      <span class="today-chip">DAY ${todayIdx + 1}</span>
+      <span class="today-emoji">${today.emoji}</span>
+      <div class="today-category">${today.category}</div>
+      <div class="today-title">${today.title}</div>
+      <div>${today.keywords.slice(0,3).map(k=>`<span class="tag">${k}</span>`).join('')}</div>
+      ${completedDays.includes(todayIdx) ? '<div class="done-badge"><span>✓</span> 학습 완료</div>' : ''}
+    </div>
+
+    <div class="section-label fade-up" style="animation-delay:.11s">주차별 커리큘럼</div>
+    <div class="week-tabs fade-up" style="animation-delay:.12s">${weekTabs}</div>
+    <div class="day-list fade-up" style="animation-delay:.13s">${dayItems}</div>
+  `;
+}
+
+function renderStudy() {
+  const data = STUDY_DATA[selectedDay];
+  const isDone = completedDays.includes(selectedDay);
+
+  const contentHtml = data.content.map(line => {
+    if (line.type === 'h') return `<div class="content-heading">${line.text}</div>`;
+    return `<div class="content-bullet"><span class="bullet-dot">·</span><span>${line.text}</span></div>`;
+  }).join('');
+
+  const quizHtml = !showQuiz
+    ? `<button class="quiz-btn" id="open-quiz-btn">📝 학습 확인 퀴즈 풀기</button>`
+    : `<div class="quiz-card pop-in">
+        <div class="quiz-section-label">오늘의 퀴즈</div>
+        <div class="quiz-question">${data.quiz.q}</div>
+        <div class="quiz-options">
+          ${data.quiz.opts.map((opt,i) => {
+            let cls = '';
+            if (quizAnswered !== null) {
+              if (i === data.quiz.ans) cls = 'correct';
+              else if (i === selectedOption) cls = 'wrong';
+            }
+            return `<button class="quiz-option ${cls}" data-opt="${i}" ${quizAnswered !== null ? 'disabled' : ''}>
+              <span class="opt-num">${['①','②','③','④'][i]}</span>${opt}
+            </button>`;
+          }).join('')}
+        </div>
+        ${quizAnswered !== null ? `
+          <div class="quiz-result ${quizAnswered === data.quiz.ans ? 'ok' : 'ng'}">
+            ${quizAnswered === data.quiz.ans
+              ? '🎉 정답! 오늘 학습 완료예요.'
+              : `❌ 틀렸어요. 정답: '${data.quiz.opts[data.quiz.ans]}'`}
+          </div>
+          ${!isDone && quizAnswered !== data.quiz.ans
+            ? `<button class="manual-done-btn" id="manual-done-btn">내용은 이해했어요 — 완료로 표시</button>` : ''}
+        ` : ''}
+      </div>`;
+
+  return `
+    <div class="back-row fade-up">
+      <button class="back-btn" id="back-btn">← 목록</button>
+      <div class="badge" style="font-size:10px;padding:4px 12px">DAY ${selectedDay + 1}</div>
+      ${isDone ? '<div class="complete-chip">✓ 완료</div>' : ''}
+    </div>
+    <div class="study-card fade-up" style="animation-delay:.05s">
+      <div class="study-cat">${data.category}</div>
+      <div class="study-title">${data.emoji} ${data.title}</div>
+      <div class="content-body">${contentHtml}</div>
+      <div class="keywords-row">
+        <div class="keywords-label">핵심 키워드</div>
+        <div>${data.keywords.map(k=>`<span class="tag">${k}</span>`).join('')}</div>
+      </div>
+    </div>
+    ${quizHtml}
+  `;
+}
+
+function bindEvents() {
+  document.querySelectorAll('[data-open]').forEach(el => {
+    el.addEventListener('click', () => {
+      selectedDay = parseInt(el.dataset.open);
+      quizAnswered = null; selectedOption = null; showQuiz = false;
+      currentView = 'study'; render(); window.scrollTo(0,0);
+    });
+  });
+  document.querySelectorAll('[data-week]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeWeek = parseInt(btn.dataset.week); render();
+    });
+  });
+  const backBtn = document.getElementById('back-btn');
+  if (backBtn) backBtn.addEventListener('click', () => {
+    currentView = 'home'; showQuiz = false; render(); window.scrollTo(0,0);
+  });
+  const openQuiz = document.getElementById('open-quiz-btn');
+  if (openQuiz) openQuiz.addEventListener('click', () => { showQuiz = true; render(); });
+  document.querySelectorAll('[data-opt]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (quizAnswered !== null) return;
+      const i = parseInt(btn.dataset.opt);
+      selectedOption = i; quizAnswered = i;
+      if (i === STUDY_DATA[selectedDay].quiz.ans) markComplete(selectedDay);
+      render();
+    });
+  });
+  const manualBtn = document.getElementById('manual-done-btn');
+  if (manualBtn) manualBtn.addEventListener('click', () => { markComplete(selectedDay); render(); });
+}
+
+// ─── PWA Manifest ───────────────────────────────────────
+const manifest = {
+  name:"SecureStudy — 정보보안기사 30일",short_name:"SecureStudy",
+  description:"정보보안기사 30일 완성 학습 앱",start_url:"./",display:"standalone",
+  background_color:"#0a0f1e",theme_color:"#0a0f1e",orientation:"portrait",lang:"ko",
+  icons:[
+    {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='48' fill='%230a0f1e'/%3E%3Ctext x='96' y='130' font-size='96' text-anchor='middle'%3E%F0%9F%94%90%3C/text%3E%3C/svg%3E",sizes:"192x192",type:"image/svg+xml"},
+    {src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='120' fill='%230a0f1e'/%3E%3Ctext x='256' y='340' font-size='256' text-anchor='middle'%3E%F0%9F%94%90%3C/text%3E%3C/svg%3E",sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}
+  ]
+};
+document.getElementById('manifest-link').href = URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'}));
+
+// ─── Service Worker ──────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  const sw = `const C='ss30-v1';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll([self.location.href])));self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match(e.request))));});`;
+  navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'})),{scope:'./'});
+}
+
+// ─── Install Prompt ──────────────────────────────────────
+let deferredPrompt = null;
+const banner = document.getElementById('install-banner');
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; banner.classList.add('show'); });
+document.getElementById('install-ok-btn').addEventListener('click', () => { banner.classList.remove('show'); if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;} });
+document.getElementById('install-dismiss-btn').addEventListener('click', () => banner.classList.remove('show'));
+
+render();
+</script>
+</body>
+</html>
